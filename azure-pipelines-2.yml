@@ -18,9 +18,9 @@ steps:
     scriptType: 'ps'
     scriptLocation: 'inlineScript'
     inlineScript: |
-      az storage blob upload --account-name 1ststorage1901 `
-                             --account-key  `
-                             --container-name backupblob `
+      az storage blob upload --account-name '1ststorage1901'
+                             --account-key  
+                             --container-name 'backupblod' 
                              --file "C:\Users\AnushaSagarGadipelli\master.bak" `
                              --name "master.bak"
 
