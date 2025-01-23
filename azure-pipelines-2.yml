@@ -14,7 +14,7 @@ steps:
 - task: AzureCLI@2
   displayName: 'Upload Backup to Azure Blob Storage'
   inputs:
-    azureSubscription: '<Your Azure DevOps Service Connection>'
+    azureSubscription: 'Free Trial(2240f72a-a86c-4097-b47e-f91902a1512c)'
     scriptType: 'ps'
     scriptLocation: 'inlineScript'
     inlineScript: |
