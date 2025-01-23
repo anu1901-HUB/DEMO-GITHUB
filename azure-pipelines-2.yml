@@ -15,7 +15,7 @@ steps:
   displayName: 'Upload Backup to Azure Blob Storage'
   inputs:
     azureSubscription: 'Free Trial(2240f72a-a86c-4097-b47e-f91902a1512c)'
-    scriptType: 'ps'
+    scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
       az storage blob upload --account-name '1ststorage1901'
