@@ -26,8 +26,8 @@ steps:
     scriptLocation: 'inlineScript'
     inlineScript: |
       az storage blob upload --account-name <yourstorageaccount> `
-                             --account-key <yourstoragekey> `
-                             --container-name <yourcontainername> `
-                             --file "C:\Backups\YourDatabase.bak" `
-                             --name "YourDatabase.bak"
+                             --account-key <> `
+                             --container-name <backupblob> `
+                             --file "C:\Users\AnushaSagarGadipelli\master.bak" `
+                             --name "master.bak"
 
