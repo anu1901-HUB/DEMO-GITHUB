@@ -1,0 +1,33 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- task: PowerShell@2
+  displayName: 'Run SQL Backup Script'
+  inputs:
+    targetType: 'inline'
+    script: |
+      # Execute your SQL backup script here
+      sqlcmd -S <YourSqlServer> -U <YourUsername> -P <YourPassword> -Q "BACKUP DATABASE [YourDatabase] TO DISK = 'C:\Backups\YourDatabase.bak'"
+
+- task: AzureCLI@2
+  displayName: 'Upload Backup to Azure Blob Storage'
+  inputs:
+    azureSubscription: '<Your Azure DevOps Service Connection>'
+    scriptType: 'ps'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az storage blob upload --account-name <yourstorageaccount> `
+                             --account-key <yourstoragekey> `
+                             --container-name <yourcontainername> `
+                             --file "C:\Backups\YourDatabase.bak" `
+                             --name "YourDatabase.bak"
+
