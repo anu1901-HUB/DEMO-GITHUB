@@ -4,35 +4,44 @@
 # https://aka.ms/yaml
 
 trigger:
-- main
+- main  
 
 pool:
   vmImage: 'windows-latest'
- 
-  variables:
-  - variable group
-steps:
 
+variables:
+  sqlServer: 'localdb\local'
+  sqlDatabase: 'master'
+  backupPath: 'path'
+  storageAccount: '1ststorage1901'
+  storageKey: 'key'
+  containerName: 'backupblod'
+  blobName: 'master.bak'
+
+steps:
+# Step 1: Back up the SQL database
 - task: PowerShell@2
+  displayName: "Backup SQL Database"
   inputs:
     targetType: 'inline'
     script: |
-      # Step 1: Back up the SQL database
-      Invoke-Sqlcmd -ServerInstance "localdb\local" -Database "master" -Query "
-      BACKUP DATABASE master
-      TO DISK = 'C:\Users\AnushaSagarGadipelli\master.bak'
+      Invoke-Sqlcmd -ServerInstance "$(sqlServer)" -Query "
+      BACKUP DATABASE [$(sqlDatabase)]
+      TO DISK = '$(backupPath)'
       WITH FORMAT, INIT;"
- 
- - task: AzureCLI@2
-  displayName: 'Upload Backup to Azure Blob Storage'
+
+# Step 2: Upload the backup file to Azure Blob Storage
+- task: AzureCLI@2
+  displayName: "Upload to Azure Blob Storage"
   inputs:
-    azureSubscription: 'Free Trial(2240f72a-a86c-4097-b47e-f91902a1512c)'
+    azureSubscription: 'Free Trial(2240f72a-a86c-4097-b47e-f91902a1512c)' 
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
-      az storage blob upload --account-name '1ststorage1901'
-                             --$(account-key)  
-                             --container-name 'backupblod' 
-                             --file "C:\Users\AnushaSagarGadipelli\master.bak" `
-                             --name "master.bak"
+      az storage blob upload \
+        --account-name "$(storageAccount)" \
+        --account-key "$(storageKey)" \
+        --container-name "$(containerName)" \
+        --file "$(backupPath)" \
+        --name "$(blobName)"
 
