@@ -9,7 +9,9 @@ trigger:
 pool:
   vmImage: 'windows-latest'
 
+  
 variables:
+  group :new group connectiion
   sqlServer: 'sql-use-cca-qa-02.database.windows.net'
   sqlDatabase: 'db-adventurous'
   backupPath: 'path'
@@ -34,7 +36,7 @@ steps:
 - task: AzureCLI@2
   displayName: "Upload to Azure Blob Storage"
   inputs:
-    azureSubscription: 'Free Trial(2240f72a-a86c-4097-b47e-f91902a1512c)' 
+    azureSubscription: 'test_connection' 
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
