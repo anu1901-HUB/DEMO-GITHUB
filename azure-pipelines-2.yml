@@ -8,9 +8,9 @@ trigger:
 
 pool:
   vmImage: 'windows-latest'
-
+  variables:
+  - variable group
 steps:
-
 - task: AzureCLI@2
   displayName: 'Upload Backup to Azure Blob Storage'
   inputs:
@@ -19,7 +19,7 @@ steps:
     scriptLocation: 'inlineScript'
     inlineScript: |
       az storage blob upload --account-name '1ststorage1901'
-                             --account-key  
+                             --$(account-key)  
                              --container-name 'backupblod' 
                              --file "C:\Users\AnushaSagarGadipelli\master.bak" `
                              --name "master.bak"
