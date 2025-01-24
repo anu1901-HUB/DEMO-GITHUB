@@ -10,12 +10,12 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  sqlServer: ''
-  sqlDatabase: 'master'
+  sqlServer: 'sql-use-cca-qa-02.database.windows.net'
+  sqlDatabase: 'db-adventurous'
   backupPath: 'path'
-  storageAccount: '1ststorage1901'
+  storageAccount: 'stusetest'
   storageKey: 'key'
-  containerName: 'backupblod'
+  containerName: 'test'
   blobName: 'master.bak'
 
 steps:
