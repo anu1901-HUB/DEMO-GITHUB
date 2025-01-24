@@ -8,10 +8,22 @@ trigger:
 
 pool:
   vmImage: 'windows-latest'
+ 
   variables:
   - variable group
 steps:
-- task: AzureCLI@2
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      # Step 1: Back up the SQL database
+      Invoke-Sqlcmd -ServerInstance "localdb\local" -Database "master" -Query "
+      BACKUP DATABASE master
+      TO DISK = 'C:\Users\AnushaSagarGadipelli\master.bak'
+      WITH FORMAT, INIT;"
+ 
+ - task: AzureCLI@2
   displayName: 'Upload Backup to Azure Blob Storage'
   inputs:
     azureSubscription: 'Free Trial(2240f72a-a86c-4097-b47e-f91902a1512c)'
