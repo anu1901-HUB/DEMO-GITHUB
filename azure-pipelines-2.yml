@@ -10,7 +10,7 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  sqlServer: 'localdb\local'
+  sqlServer: ''
   sqlDatabase: 'master'
   backupPath: 'path'
   storageAccount: '1ststorage1901'
