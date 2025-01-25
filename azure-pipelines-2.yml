@@ -12,13 +12,9 @@ pool:
   
 variables:
   group :new variable group
-  sqlServer: 'server'
-  sqlDatabase: 'db-adventurous'
-  backupPath: 'path'
-  storageAccount: 'stusetest'
+
   storageKey: 'key'
-  containerName: 'test'
-  blobName: 'master.bak'
+    blobName: 'master.bak'
 
 steps:
 # Step 1: Back up the SQL database
@@ -29,7 +25,7 @@ steps:
     script: |
       Invoke-Sqlcmd -ServerInstance sql-use-cca-qa-02.database.windows.net -Query "
       BACKUP DATABASE [$(db-adventurous)]
-      TO DISK = '$(backupPath)'
+      TO DISK = 'System.DefaultWorkingDirectory'
       WITH FORMAT, INIT;"
 
 # Step 2: Upload the backup file to Azure Blob Storage
@@ -41,9 +37,9 @@ steps:
     scriptLocation: 'inlineScript'
     inlineScript: |
       az storage blob upload \
-        --account-name "$(stusetest)" \
+        --account-name "stusetest" \
         --account-key "$(key)" \
-        --container-name "$(containerName)" \
-        --file "$(backupPath)" \
+        --container-name "test" \
+        --file "System.DefaultWorkingDirectory" \
         --name "$(blobName)"
 
