@@ -3,17 +3,18 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
+
 trigger:
 - main  
 
 pool:
   vmImage: 'windows-latest'
 
-  
 variables:
-  group :new variable group
+  group: 'new variable group'
   storageKey: 'key'
-    #blobName: 'master.bak'
+  backupPath: '$(System.DefaultWorkingDirectory)\master.bak' 
+  blobName: 'master.bak' # Name of the blob to upload in Azure Blob Storage
 
 steps:
 # Step 1: Back up the SQL database
@@ -22,10 +23,12 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      Invoke-Sqlcmd -ServerInstance sql-use-cca-qa-02.database.windows.net -Query "
-      BACKUP DATABASE db-adventurous
-      TO DISK = 'System.DefaultWorkingDirectory'
+      Write-Host "Starting SQL Database Backup..."
+      Invoke-Sqlcmd -ServerInstance "sql-use-cca-qa-02.database.windows.net" -Database "db-adventurous" -Query "
+      BACKUP DATABASE [db-adventurous]
+      TO DISK = N'$(backupPath)'
       WITH FORMAT, INIT;"
+      Write-Host "Backup Completed. File saved at $(backupPath)."
 
 # Step 2: Upload the backup file to Azure Blob Storage
 - task: AzureCLI@2
@@ -35,10 +38,11 @@ steps:
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
+      echo "Uploading backup file to Azure Blob Storage..."
       az storage blob upload \
         --account-name "stusetest" \
-        --account-key "$(key)" \
+        --account-key "$(storageKey)" \
         --container-name "test" \
-        --file "System.DefaultWorkingDirectory" \
-#        --name "$(blobName)"
-
+        --file "$(backupPath)" \
+        --name "$(blobName)"
+      echo "Upload Completed."
