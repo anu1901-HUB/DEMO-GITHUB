@@ -13,11 +13,11 @@ pool:
 variables:
   group: 'new variable group'
 
-  sqlUsername: "dbadv"
+  sqlUsername: 'user'
   sqlPassword: 'sqlPassword' 
   storageKey: 'key'
   backupPath: '$(System.DefaultWorkingDirectory)\master.bak' 
-  blobName: 'master.bak' # Name of the blob to upload in Azure Blob Storage
+  blobName: 'master.bak' 
 
 steps:
 # Step 1: Back up the SQL database
@@ -38,6 +38,7 @@ steps:
         BACKUP DATABASE [$database]
         TO DISK = '$(System.DefaultWorkingDirectory)\master.bak'
         WITH FORMAT, INIT;" -Credential $credential
+        
 #Invoke-Sqlcmd -ServerInstance "sql-use-cca-qa-02.database.windows.net" -Database "db-adventurous" -Query "
 #      BACKUP DATABASE [db-adventurous]
 #     TO DISK = N'$(backupPath)'
