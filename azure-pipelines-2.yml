@@ -12,6 +12,9 @@ pool:
 
 variables:
   group: 'new variable group'
+
+  sqlUsername: "dbadv"
+  sqlPassword: 'sqlPassword' 
   storageKey: 'key'
   backupPath: '$(System.DefaultWorkingDirectory)\master.bak' 
   blobName: 'master.bak' # Name of the blob to upload in Azure Blob Storage
@@ -23,12 +26,23 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
+  $serverInstance = "sql-use-cca-qa-02.database.windows.net"
+      $database = "db-adventurous"
+      $username = "$(sqlUsername)"  # Define this variable in your pipeline or variable group
+      $password = "$(sqlPassword)"  # Define this variable in your pipeline or variable group
+      $securePassword = ConvertTo-SecureString $password -AsPlainText -Force
+      $credential = New-Object System.Management.Automation.PSCredential($username, $securePassword)
+
       Write-Host "Starting SQL Database Backup..."
-      Invoke-Sqlcmd -ServerInstance "sql-use-cca-qa-02.database.windows.net" -Database "db-adventurous" -Query "
-      BACKUP DATABASE [db-adventurous]
-      TO DISK = N'$(backupPath)'
-      WITH FORMAT, INIT;"
-      Write-Host "Backup Completed. File saved at $(backupPath)."
+      Invoke-Sqlcmd -ServerInstance $serverInstance -Database $database -Query "
+        BACKUP DATABASE [$database]
+        TO DISK = '$(System.DefaultWorkingDirectory)\master.bak'
+        WITH FORMAT, INIT;" -Credential $credential
+#Invoke-Sqlcmd -ServerInstance "sql-use-cca-qa-02.database.windows.net" -Database "db-adventurous" -Query "
+#      BACKUP DATABASE [db-adventurous]
+#     TO DISK = N'$(backupPath)'
+#      WITH FORMAT, INIT;"
+#      Write-Host "Backup Completed. File saved at $(backupPath)."
 
 # Step 2: Upload the backup file to Azure Blob Storage
 - task: AzureCLI@2
