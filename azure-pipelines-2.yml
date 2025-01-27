@@ -11,14 +11,13 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  group: 'new variable group'  # Variable group for storing sensitive info like credentials
+  group: 'new variable group'  
 
-  sqlUsername: 'user'           # Define SQL username
-  sqlPassword: 'sqlPassword'    # Define SQL password
-  storageKey: 'key'             # Azure Storage account key
+  sqlUsername: 'user'
+  sqlPassword: 'sqlPassword'
+  storageKey: 'key'
   backupPath: '$(System.DefaultWorkingDirectory)\master.bak'  # Backup file path
-  blobName: 'master.bak'        # Blob name in Azure storage
-
+  blobName: 'master.bak'       
 steps:
 # Step 1: Back up the SQL database
 - task: PowerShell@2
@@ -30,8 +29,6 @@ steps:
       $database = "db-adventurous"
       $username = "$(sqlUsername)"
       $password = "$(sqlPassword)"
-
-      # Convert password to a secure string
       $securePassword = ConvertTo-SecureString $password -AsPlainText -Force
 
       Write-Host "Starting SQL Database Backup..."
