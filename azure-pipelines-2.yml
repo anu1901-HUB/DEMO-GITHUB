@@ -11,13 +11,13 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  group: 'new variable group'
+  group: 'new variable group'  # Variable group for storing sensitive info like credentials
 
-  sqlUsername: 'user'
-  sqlPassword: 'sqlPassword' 
-  storageKey: 'key'
-  backupPath: '$(System.DefaultWorkingDirectory)\master.bak' 
-  blobName: 'master.bak' 
+  sqlUsername: 'user'           # Define SQL username
+  sqlPassword: 'sqlPassword'    # Define SQL password
+  storageKey: 'key'             # Azure Storage account key
+  backupPath: '$(System.DefaultWorkingDirectory)\master.bak'  # Backup file path
+  blobName: 'master.bak'        # Blob name in Azure storage
 
 steps:
 # Step 1: Back up the SQL database
@@ -26,24 +26,23 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-  $serverInstance = "sql-use-cca-qa-02.database.windows.net"
+      $serverInstance = "sql-use-cca-qa-02.database.windows.net"
       $database = "db-adventurous"
-      $username = "$(sqlUsername)"  # Define this variable in your pipeline or variable group
-      $password = "$(sqlPassword)"  # Define this variable in your pipeline or variable group
+      $username = "$(sqlUsername)"
+      $password = "$(sqlPassword)"
+
+      # Convert password to a secure string
       $securePassword = ConvertTo-SecureString $password -AsPlainText -Force
-      $credential = New-Object System.Management.Automation.PSCredential($username, $securePassword)
 
       Write-Host "Starting SQL Database Backup..."
+      
+      # Use username and password to authenticate with Azure SQL
       Invoke-Sqlcmd -ServerInstance $serverInstance -Database $database -Query "
         BACKUP DATABASE [$database]
         TO DISK = '$(System.DefaultWorkingDirectory)\master.bak'
-        WITH FORMAT, INIT;" -Credential $credential
-        
-#Invoke-Sqlcmd -ServerInstance "sql-use-cca-qa-02.database.windows.net" -Database "db-adventurous" -Query "
-#      BACKUP DATABASE [db-adventurous]
-#     TO DISK = N'$(backupPath)'
-#      WITH FORMAT, INIT;"
-#      Write-Host "Backup Completed. File saved at $(backupPath)."
+        WITH FORMAT, INIT;" -Username $username -Password $password
+      
+      Write-Host "Backup Completed. File saved at $(System.DefaultWorkingDirectory)\master.bak."
 
 # Step 2: Upload the backup file to Azure Blob Storage
 - task: AzureCLI@2
@@ -58,6 +57,6 @@ steps:
         --account-name "stusetest" \
         --account-key "$(storageKey)" \
         --container-name "test" \
-        --file "$(backupPath)" \
+        --file "$(System.DefaultWorkingDirectory)/master.bak" \
         --name "$(blobName)"
       echo "Upload Completed."
